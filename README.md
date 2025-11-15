@@ -72,6 +72,85 @@ Run `facebook-scraper --help` for more details on CLI usage.
 
 **Note:** If you get a `UnicodeEncodeError` try adding `--encoding utf-8`.
 
+## HTTP API and OpenAPI schema
+
+For hosted deployments the project now ships with a lightweight HTTP service
+that exposes the existing scraping helpers. Start it locally with:
+
+```bash
+python -m facebook_scraper.api
+```
+
+The server listens on the `PORT` environment variable (default `8000`) and
+provides:
+
+- `GET /health` – readiness probe used by Railway.
+- `GET /openapi.json` – machine-readable OpenAPI 3 schema.
+- `GET /docs` – embedded Swagger UI backed by the OpenAPI schema.
+- `POST /posts` – scrape posts by passing the same arguments you would send to
+  `get_posts`. Exactly one of `account`, `group`, `post_urls`, or `hashtag`
+  must be present.
+
+Example request:
+
+```bash
+curl -X POST http://localhost:8000/posts \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "account": "nintendo",
+        "limit": 5,
+        "options": {"comments": 0}
+      }'
+```
+
+The response mirrors the CLI output:
+
+```json
+{
+  "count": 5,
+  "posts": [
+    {"post_id": "123", "text": "..."},
+    {"post_id": "124", "text": "..."}
+  ]
+}
+```
+
+## Running inside Docker
+
+The repository includes a lightweight Docker setup so the CLI can run inside a
+container without installing the package on your host machine.
+
+```bash
+docker build -t facebook-scraper .
+docker run --rm -p 8000:8000 facebook-scraper
+```
+
+The container now serves the HTTP API by default. To run the traditional CLI
+instead, override the entrypoint when starting the container:
+
+```bash
+docker run --rm -it \
+  --entrypoint facebook-scraper \
+  -v "$PWD/cookies.txt:/app/cookies.txt:ro" \
+  facebook-scraper --cookies /app/cookies.txt "Mark Zuckerberg"
+```
+
+Any CLI flag supported by `python -m facebook_scraper` can be passed directly to
+that command. Mount a cookies file (or pass `--email/--password`) so the scraper
+can authenticate before hitting Facebook endpoints.
+
+## Deploying to Railway
+
+For hosted runs the repository also provides a simple `Procfile` and
+`railways.json`. Create a Railway project from this repository and the platform
+will automatically build the Docker image and start the API service by running
+`python -m facebook_scraper.api`.
+
+Cookies or credentials should be configured as Railway variables and referenced
+in the POST payload you send to `/posts` (for example, store cookies in object
+storage and point the API to the downloaded path, or supply the cookie values as
+JSON).
+
 ### Practical example: donwload comments of a post
 
 ```python
