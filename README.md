@@ -72,6 +72,43 @@ Run `facebook-scraper --help` for more details on CLI usage.
 
 **Note:** If you get a `UnicodeEncodeError` try adding `--encoding utf-8`.
 
+### Loading cookies from a `.env` file
+
+The CLI now auto-loads cookies defined inside a `.env` file located in the current
+working directory. Add either of the following keys:
+
+| Key | Purpose |
+| --- | --- |
+| `FACEBOOK_COOKIES_FILE` | Path to a cookies file in Netscape/JSON format. |
+| `FACEBOOK_COOKIES` | Raw `Cookie` header string (e.g. `c_user=...; xs=...`). |
+
+If no `--cookies` argument is provided, the CLI will fall back to
+`FACEBOOK_COOKIES_FILE` and then `FACEBOOK_COOKIES`.
+
+## Running in Docker/Railway
+
+The repository now ships with a ready-to-use `Dockerfile`, `.dockerignore`, `Procfile`, and `railways.json` so the CLI can run in
+containerized environments such as Railway.com without touching the original package code.
+
+### Build the image locally
+
+```sh
+docker build -t facebook-scraper .
+```
+
+### Run the CLI via Docker
+
+Override the default `--help` command with any CLI arguments you normally pass:
+
+```sh
+docker run --rm facebook-scraper nintendo --pages 1
+```
+
+### Railway deployment
+
+Railway will automatically detect the `railways.json`/`Procfile` pair and execute the CLI command defined there. Update the
+`startCommand` inside `railways.json` (or configure the Railway dashboard) to pass the arguments you need.
+
 ### Practical example: donwload comments of a post
 
 ```python

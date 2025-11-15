@@ -1,0 +1,1 @@
+worker: facebook-scraper --help

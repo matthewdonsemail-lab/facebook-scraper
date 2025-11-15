@@ -1,13 +1,35 @@
 import argparse
-import logging
-import pathlib
-import datetime
-import sys
-import locale
-import json
 import csv
+import datetime
+import json
+import locale
+import logging
+import os
+import pathlib
+import sys
 
 from . import enable_logging, write_posts_to_csv, get_profile
+
+
+ENV_COOKIE_STRING_KEY = "FACEBOOK_COOKIES"
+ENV_COOKIE_FILE_KEY = "FACEBOOK_COOKIES_FILE"
+
+
+def _load_env_file(path: str = ".env") -> dict:
+    env_path = pathlib.Path(path)
+    if not env_path.is_file():
+        return {}
+
+    env_data = {}
+    for line in env_path.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        if '=' not in line:
+            continue
+        key, value = line.split('=', 1)
+        env_data[key.strip()] = value.strip().strip('"').strip("'")
+    return env_data
 
 
 def run():
@@ -134,7 +156,14 @@ def run():
         default=False,
     )
 
+    os.environ.update(_load_env_file())
+
     args = parser.parse_args()
+
+    if args.cookies is None:
+        args.cookies = os.environ.get(ENV_COOKIE_FILE_KEY)
+    if args.cookies is None:
+        args.cookies = os.environ.get(ENV_COOKIE_STRING_KEY)
 
     # Enable logging
     if args.verbose > 0:
