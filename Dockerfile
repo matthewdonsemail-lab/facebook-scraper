@@ -15,6 +15,5 @@ COPY . .
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir .
 
-EXPOSE 8000
-
-ENTRYPOINT ["python", "-m", "facebook_scraper.api"]
+ENTRYPOINT ["facebook-scraper"]
+CMD ["--help"]

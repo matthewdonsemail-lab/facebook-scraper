@@ -2,6 +2,6 @@
   "$schema": "https://railway.com/railway.schema.json",
   "serviceName": "facebook-scraper",
   "buildCommand": "pip install --upgrade pip && pip install .",
-  "startCommand": "python -m facebook_scraper.api",
-  "healthcheckPath": "/health"
+  "startCommand": "facebook-scraper --help",
+  "healthcheckPath": "/"
 }

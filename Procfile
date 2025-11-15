@@ -1,1 +1,1 @@
-web: python -m facebook_scraper.api
+worker: facebook-scraper --help
