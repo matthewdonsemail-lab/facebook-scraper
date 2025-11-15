@@ -11,6 +11,7 @@ from typing import Any, Dict, Iterator, Optional, Set, Union
 from requests.cookies import cookiejar_from_dict
 
 from .constants import DEFAULT_REQUESTS_TIMEOUT, DEFAULT_COOKIES_FILE_PATH
+from .compat import ensure_lxml_html_clean
 from .facebook_scraper import FacebookScraper
 from .fb_types import Credentials, Post, RawPost, Profile
 from .utils import html_element_to_string, parse_cookie_file
@@ -21,6 +22,8 @@ from datetime import datetime, timedelta
 import re
 import os
 
+
+ensure_lxml_html_clean()
 
 _scraper = FacebookScraper()
 
