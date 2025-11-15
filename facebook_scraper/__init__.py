@@ -13,7 +13,7 @@ from requests.cookies import cookiejar_from_dict
 from .constants import DEFAULT_REQUESTS_TIMEOUT, DEFAULT_COOKIES_FILE_PATH
 from .facebook_scraper import FacebookScraper
 from .fb_types import Credentials, Post, RawPost, Profile
-from .utils import html_element_to_string, parse_cookie_file, parse_cookie_string
+from .utils import html_element_to_string, parse_cookie_file
 from . import exceptions
 import traceback
 import time
@@ -39,8 +39,6 @@ def set_cookies(cookies):
         else:
             try:
                 cookies = parse_cookie_file(cookies)
-            except (FileNotFoundError, OSError):
-                cookies = parse_cookie_string(cookies)
             except ValueError as e:
                 raise exceptions.InvalidCookies(f"Cookies are in an invalid format: {e}")
     elif isinstance(cookies, dict):

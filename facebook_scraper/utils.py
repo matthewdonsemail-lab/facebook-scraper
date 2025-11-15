@@ -273,27 +273,6 @@ def parse_cookie_file(filename: str) -> RequestsCookieJar:
     return jar
 
 
-def parse_cookie_string(raw_cookies: str) -> RequestsCookieJar:
-    """Parse a raw ``Cookie`` header string into a ``RequestsCookieJar``."""
-
-    if raw_cookies is None:
-        raise ValueError("Cookie string cannot be None")
-
-    jar = RequestsCookieJar()
-    cookie_pairs = [segment.strip() for segment in raw_cookies.split(';') if segment.strip()]
-
-    if not cookie_pairs:
-        raise ValueError("Cookie string is empty")
-
-    for pair in cookie_pairs:
-        if '=' not in pair:
-            raise ValueError(f"Invalid cookie segment: '{pair}'")
-        name, value = pair.split('=', 1)
-        jar.set(name.strip(), value.strip())
-
-    return jar
-
-
 def safe_consume(generator, sleep=0):
     result = []
     try:

@@ -72,52 +72,33 @@ Run `facebook-scraper --help` for more details on CLI usage.
 
 **Note:** If you get a `UnicodeEncodeError` try adding `--encoding utf-8`.
 
-### Loading cookies from a `.env` file
+## Running inside Docker
 
-The CLI now auto-loads cookies defined inside a `.env` file located in the current
-working directory. A `.env.example` file is included to document the required keys;
-copy it to `.env` (or provide the same variables via Railway/host environment
-variables) and add either of the following keys:
+The repository includes a lightweight Docker setup so the CLI can run inside a
+container without installing the package on your host machine.
 
-| Key | Purpose |
-| --- | --- |
-| `FACEBOOK_COOKIES_FILE` | Path to a cookies file in Netscape/JSON format. |
-| `FACEBOOK_COOKIES` | Raw `Cookie` header string (e.g. `c_user=...; xs=...`). |
-
-If no `--cookies` argument is provided, the CLI will fall back to
-`FACEBOOK_COOKIES_FILE` and then `FACEBOOK_COOKIES`.
-
-### Railway environment variables
-
-Railway automatically imports any variables defined in a local `.env` file when
-you run `railway up`. If you prefer to configure secrets in the Railway UI,
-create variables with the same names as shown in `.env.example`
-(`FACEBOOK_COOKIES_FILE` or `FACEBOOK_COOKIES`). Either approach keeps the
-containerized CLI configured without baking sensitive cookies into the image.
-
-## Running in Docker/Railway
-
-The repository now ships with a ready-to-use `Dockerfile`, `.dockerignore`, `Procfile`, and `railways.json` so the CLI can run in
-containerized environments such as Railway.com without touching the original package code.
-
-### Build the image locally
-
-```sh
+```bash
 docker build -t facebook-scraper .
+docker run --rm -it \
+  -v "$PWD/cookies.txt:/app/cookies.txt:ro" \
+  facebook-scraper --cookies /app/cookies.txt "Mark Zuckerberg"
 ```
 
-### Run the CLI via Docker
+Any CLI flag supported by `python -m facebook_scraper` can be passed directly to
+`docker run`. Mount a cookies file (or pass `--email/--password`) so the scraper
+can authenticate before hitting Facebook endpoints.
 
-Override the default `--help` command with any CLI arguments you normally pass:
+## Deploying to Railway
 
-```sh
-docker run --rm facebook-scraper nintendo --pages 1
-```
+For hosted runs the repository also provides a simple `Procfile` and
+`railways.json`. Create a Railway project from this repository and set the
+`COMMAND` environment variable (or edit the Procfile) with the arguments you
+want to pass to the CLI. Railway will build the image with its default Python
+stack and start the worker by executing `python -m facebook_scraper`.
 
-### Railway deployment
-
-Railway will automatically detect the `railways.json`/`Procfile` pair and execute the CLI command defined there. Update the
-`startCommand` inside `railways.json` (or configure the Railway dashboard) to pass the arguments you need.
+Cookies or credentials should be configured as Railway variables and mounted in
+the command you run (for example, by uploading a cookies file to object storage
+and fetching it before the scraper executes).
 
 ### Practical example: donwload comments of a post
 
