@@ -75,7 +75,9 @@ Run `facebook-scraper --help` for more details on CLI usage.
 ### Loading cookies from a `.env` file
 
 The CLI now auto-loads cookies defined inside a `.env` file located in the current
-working directory. Add either of the following keys:
+working directory. A `.env.example` file is included to document the required keys;
+copy it to `.env` (or provide the same variables via Railway/host environment
+variables) and add either of the following keys:
 
 | Key | Purpose |
 | --- | --- |
@@ -84,6 +86,14 @@ working directory. Add either of the following keys:
 
 If no `--cookies` argument is provided, the CLI will fall back to
 `FACEBOOK_COOKIES_FILE` and then `FACEBOOK_COOKIES`.
+
+### Railway environment variables
+
+Railway automatically imports any variables defined in a local `.env` file when
+you run `railway up`. If you prefer to configure secrets in the Railway UI,
+create variables with the same names as shown in `.env.example`
+(`FACEBOOK_COOKIES_FILE` or `FACEBOOK_COOKIES`). Either approach keeps the
+containerized CLI configured without baking sensitive cookies into the image.
 
 ## Running in Docker/Railway
 
