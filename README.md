@@ -72,6 +72,34 @@ Run `facebook-scraper --help` for more details on CLI usage.
 
 **Note:** If you get a `UnicodeEncodeError` try adding `--encoding utf-8`.
 
+## Running inside Docker
+
+The repository includes a lightweight Docker setup so the CLI can run inside a
+container without installing the package on your host machine.
+
+```bash
+docker build -t facebook-scraper .
+docker run --rm -it \
+  -v "$PWD/cookies.txt:/app/cookies.txt:ro" \
+  facebook-scraper --cookies /app/cookies.txt "Mark Zuckerberg"
+```
+
+Any CLI flag supported by `python -m facebook_scraper` can be passed directly to
+`docker run`. Mount a cookies file (or pass `--email/--password`) so the scraper
+can authenticate before hitting Facebook endpoints.
+
+## Deploying to Railway
+
+For hosted runs the repository also provides a simple `Procfile` and
+`railways.json`. Create a Railway project from this repository and set the
+`COMMAND` environment variable (or edit the Procfile) with the arguments you
+want to pass to the CLI. Railway will build the image with its default Python
+stack and start the worker by executing `python -m facebook_scraper`.
+
+Cookies or credentials should be configured as Railway variables and mounted in
+the command you run (for example, by uploading a cookies file to object storage
+and fetching it before the scraper executes).
+
 ### Practical example: donwload comments of a post
 
 ```python
